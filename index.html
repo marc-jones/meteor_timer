@@ -1,3 +1,19 @@
-<script type="text/javascript" src="meteor_app.js"></script>
-<script type="text/javascript" src="phaser/build/phaser.min.js"></script>
-<div id="test"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Meteor Timer</title>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="meteor_app.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Orbitron:400,700' rel='stylesheet' type='text/css'>
+    <link href='assets/css/timer.css' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <h1>Time: <span class='time_span'><span id='mins'></span>:<span id='secs'></span></span></h1>
+    <h1>Altitude Zone: <span id='altitude'></span></h1>
+    <button id='overkill'>OVERKILL</button>
+    <button id='pause'>PAUSE</button>
+    <button id='stop'>STOP</button>
+    <button id='start'>START</button>
+</body>
+</html>

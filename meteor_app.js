@@ -1,80 +1,103 @@
-// Phaser current version test environment
-// Simple countdown timer
+$(document).ready(function(){
+    d3.select('#stop')
+      .classed('hidden', true);
+    $('#start').on('click', function() {
+        d3.select('#start')
+          .classed('hidden', true)
+          .classed('visible', false);
+        d3.select('#stop')
+          .classed('visible', true)
+          .classed('hidden', false);
+        startTimer();
+    })
+});
 
-window.onload = function() {
 
-    var game = new Phaser.Game(600, 400, Phaser.AUTO, 'meteor-timer', null,
-            false, false);
+function startTimer(){
 
-    var Timer = function(game) {};
-
-    Timer.Boot = function(game) {};
-
+    altitude_zone = 5;
+    mins = 5;
+    secs = 0;
+    minute_length = 60
     
-    var timer, timerEvent, altitude_zone;
-
-    Timer.Boot.prototype = {
-        
-        preload: function() {
-            game.load.spritesheet('overkill', 'assets/img/overkill.png', 80, 40);
-        },
-
-        create: function() {
-            // Create a custom timer
-            timer = game.time.create();
-            
-            // Create a delayed event 1m and 30s from now
-            timerEvent = timer.add(Phaser.Timer.MINUTE * 5, this.endTimer, this);
-            
-            for (i = 1; i < 5; i++) {
-                timer.add(Phaser.Timer.MINUTE * i, this.reduce_altitude, this);
-            }
-            
-            // Start the timer
-            timer.start();
-            
-            altitude_zone = 5;
-            
-            // button(x, y, key, callback, callbackContext,
-            //        overFrame, outFrame, downFrame, upFrame, group)
-            button = game.add.button(300, 200, 'overkill', this.reduce_altitude, this, 2, 1, 0);
-        },
-
-        update: function() {
-                
-        },
-        
-        render: function() {
-            // If our timer is running, show the time in a nicely formatted way, else show 'Done!'
-            if (timer.running) {
-                game.debug.text(altitude_zone + ' ' + this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 2, 14, "#ff0");
-            }
-            else {
-                game.debug.text("Done!", 2, 14, "#0f0");
-            }
-        },
-
-        endTimer: function() {
-            // Stop the timer when the delayed event triggers
-            timer.stop();
-        },
-
-        formatTime: function(s) {
-            // Convert seconds (s) to a nicely formatted and padded time string
-            var minutes = "0" + Math.floor(s / 60);
-            var seconds = "0" + (s - minutes * 60);
-            return minutes.substr(-2) + ":" + seconds.substr(-2);   
-        },
-
-        reduce_altitude: function() {
-
-            altitude_zone = altitude_zone - 1;
-
+    game_over = false;
+    paused = false;
+    total_time = minute_length * 5;
+    last_sec_elapsed = -1;
+    altitude_zone += 1;
+    paused_time = 0;
+    unpaused_time = 0;
+    
+    alt_span = d3.select('#altitude');
+    min_span = d3.select('#mins');
+    sec_span = d3.select('#secs');
+    d3.timer(count);
+    
+    
+    function count(msElapsed) {
+        if (paused)
+        {
+            paused_time = msElapsed - unpaused_time;
+        } else {
+            unpaused_time = msElapsed - paused_time;           
         }
         
+        var secs_elapsed = Math.floor(unpaused_time/1000);
+        if (secs_elapsed != last_sec_elapsed) {
+            last_sec_elapsed = secs_elapsed;
+            min_span.html(pad_time(Math.floor((total_time-secs_elapsed)/minute_length)));
+            sec_span.html(pad_time((total_time-secs_elapsed)%minute_length));
+            if ((total_time-secs_elapsed)%minute_length == 0) {
+                reduce_altitude_zone();
+            };
+        };
+        return(game_over);
     };
     
-    game.state.add('Boot', Timer.Boot);
-    game.state.start('Boot');
+    $('#overkill').on('click', function() {
+        reduce_altitude_zone();
+    })
+
+    $('#pause').on('click', function() {
+        paused = !paused;
+        if (paused) {
+            d3.select('#pause')
+              .html('UNPAUSE');
+        } else {
+            d3.select('#pause')
+              .html('PAUSE');            
+        }
+    })
     
+    $('#stop').on('click', function() {
+        $('#overkill').off('click');
+        $('#pause').off('click');
+        d3.select('#stop')
+          .classed('hidden', true)
+          .classed('visible', false);
+        d3.select('#start')
+          .classed('visible', true)
+          .classed('hidden', false);
+          
+        end_game();
+    })
+    
+    function pad_time(number) {
+        var s = '0' + number;
+        return(s.substr(s.length-2));
+    };
+    
+    function end_game() {
+        game_over = true;
+        alt_span.html('GAME OVER!');
+    };
+    
+    function reduce_altitude_zone() {
+        altitude_zone -= 1;
+        if (altitude_zone <= 0) {
+            end_game();
+        } else {
+            alt_span.html(altitude_zone);
+        };        
+    };
 };

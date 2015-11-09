@@ -1,0 +1,12 @@
+.time_span {
+    font-family: 'Orbitron', sans-serif;
+    color: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
